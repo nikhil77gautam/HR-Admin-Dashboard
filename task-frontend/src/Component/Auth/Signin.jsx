@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import axios from "axios";
+import "./Signin.css";
 import { Link, useNavigate } from "react-router-dom";
 
 export default function Signin() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -23,21 +23,25 @@ export default function Signin() {
       );
       console.log(response.data);
 
-      navigate("/hr-dashboard");
+      const { token, role } = response.data;
+
+      // Store token in local storage
+      localStorage.setItem("authToken", token);
+
+      console.log(role);
+
+      if (role === "HR") {
+        navigate("/hr-dashboard");
+      } else if (role === "Admin") {
+        navigate("/admin-dashboard");
+      } else {
+        // default dashboard navigation
+        navigate("/default-dashboard");
+      }
     } catch (error) {
       console.error(error);
     }
   };
-  // const navigateuser = (user) => {
-  //   if (user.role === "Admin") {
-  //     navigate("/admin-dashboard");
-  //   } else if (user.role === "HR") {
-  //     navigate("/hr-dashboard");
-  //   } else {
-  //     console.error("Invalid user role:", user.role);
-  //     setError("Invalid user role. Please");
-  //   }
-  // };
 
   return (
     <div className="main-container-signin">
@@ -75,7 +79,7 @@ export default function Signin() {
         <br />
         <div>
           <Link to="/signup">
-            <b style={{ fontFamily: "Serif", color: "skyblue" }}>
+            <b style={{ fontFamily: "Serif", color: "blue", }}>
               Don't have an account? Signup
             </b>
           </Link>

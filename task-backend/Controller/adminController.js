@@ -1,5 +1,6 @@
 const Employee = require("../Models/admin");
 
+// HR Controller where HR can Add Users:
 // Add Users:
 const addUser = async (req, res) => {
   const { name, email, role } = req.body;
@@ -26,6 +27,7 @@ const addUser = async (req, res) => {
   }
 };
 
+// Admin Controller where Admin can Approve, Reject, GetAllUsers, GetPendingUsers, GetApproveUsers:
 // Approve Users:
 const approveUser = async (req, res) => {
   const { id } = req.params;
@@ -77,5 +79,32 @@ const getAllUsers = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+// Get Pending Users:
+const getPendingUsers = async (req, res) => {
+  try {
+    const users = await Employee.find({ status: "Pending" });
+    res.status(200).json(users);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
 
-module.exports = { addUser, approveUser, getAllUsers, rejectUser };
+// Get Approved Users:
+const getApproveUsers = async (req, res) => {
+  try {
+    const users = await Employee.find({ status: "Approved" });
+    res.status(200).json(users);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+module.exports = {
+  addUser,
+  approveUser,
+  getAllUsers,
+  rejectUser,
+  getPendingUsers,
+  getApproveUsers,
+
+};

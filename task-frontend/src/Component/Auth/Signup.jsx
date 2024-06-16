@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
+import "./Signup.css";
 import { Link, useNavigate } from "react-router-dom";
 
 export default function Signup() {
@@ -24,8 +25,10 @@ export default function Signup() {
         }
       );
       console.log(response.data);
+      alert("Account Created Successful");
       navigate("/");
     } catch (error) {
+      alert("This Email is already exists");
       console.error(
         "There was an error signing up:",
         error.response ? error.response.data : error.message
@@ -92,7 +95,7 @@ export default function Signup() {
         <br />
         <div>
           <Link to="/">
-            <b style={{ fontFamily: "Serif", color: "skyblue" }}>
+            <b style={{ fontFamily: "Serif", color: "blue" }}>
               Already have an account? Login
             </b>
           </Link>

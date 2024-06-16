@@ -1,100 +1,180 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import "./HR-Dashboard.css";
 
-const HRDashboard = () => {
-  const [users, setUsers] = useState([]);
+export default function HRDashboard() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [role, setRole] = useState("");
-  const [token, setToken] = useState("");
+  const [experience, setExperience] = useState("");
+  const [error, setError] = useState(null);
+  const [success, setSuccess] = useState("");
+  const [users, setUsers] = useState([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    const storedToken = localStorage.getItem("token");
-    if (storedToken) {
-      setToken(storedToken);
-      fetchUsers(storedToken);
-    } else {
-      console.error("No token found");
-    }
+    fetchUsers();
   }, []);
 
-  const fetchUsers = async (token) => {
+  const fetchUsers = async () => {
     try {
-      const response = await axios.get("http://localhost:8000/users", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+      const token = localStorage.getItem("authToken");
+
+      if (!token) {
+        throw new Error("No authentication token found. Please log in.");
+      }
+
+      const response = await axios.get("http://localhost:8000/pending", {
+        headers: { Authorization: `${token}` },
       });
+
       setUsers(response.data);
     } catch (error) {
       console.error("Error fetching users:", error);
+      setError(error.message);
     }
   };
 
-  const handleAddUser = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setError(null);
+    setSuccess("");
+    await addUser();
+  };
 
-    const newUser = {
-      name: name,
-      email: email,
-      role: role,
-    };
-
+  const addUser = async () => {
     try {
-      await axios.post("http://localhost:8000/adduser", newUser, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
+      const token = localStorage.getItem("authToken");
 
+      if (!token) {
+        throw new Error("No authentication token found. Please log in.");
+      }
+
+      const response = await axios.post(
+        "http://localhost:8000/adduser",
+        { name, email, role, experience },
+        { headers: { Authorization: `${token}` } }
+      );
+
+      console.log("User added successfully:", response.data);
+      alert("User added successfully");
       setName("");
       setEmail("");
       setRole("");
-      fetchUsers(token);
+      setExperience("");
+      await fetchUsers();
     } catch (error) {
       console.error("Error adding user:", error);
+      setError(error.message || "Failed to add user");
+      setSuccess("");
     }
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("authToken");
+    navigate("/");
   };
 
   return (
     <div className="hr-dashboard">
-      <h2>HR Dashboard</h2>
-      <form className="add-user-form" onSubmit={handleAddUser}>
-        <input
-          type="text"
-          name="name"
-          placeholder="Name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-        />
-        <input
-          type="email"
-          name="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-        <input
-          type="text"
-          name="role"
-          placeholder="Role"
-          value={role}
-          onChange={(e) => setRole(e.target.value)}
-        />
-        <button type="submit">Add Employee</button>
+      <header className="dashboard-header">
+        <h2>HR- Dashboard</h2>
+        <button className="logout-button" onClick={handleLogout}>
+          Logout
+        </button>
+      </header>
+      <form onSubmit={handleSubmit}>
+        <div className="form-group">
+          <label className="form-label">Name:</label>
+          <input
+            type="text"
+            value={name}
+            placeholder="Enter Your Name"
+            onChange={(e) => setName(e.target.value)}
+            required
+            className="form-control"
+          />
+        </div>
+        <div className="form-group">
+          <label className="form-label">Email:</label>
+          <input
+            type="email"
+            value={email}
+            placeholder="Enter Your Email"
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            className="form-control"
+          />
+        </div>
+        <div className="form-group">
+          <label className="form-label">Role:</label>
+          <select
+            value={role}
+            onChange={(e) => setRole(e.target.value)}
+            required
+            className="form-select"
+          >
+            <option value="" disabled>
+              Select Technology
+            </option>
+            <option value="HTML">HTML</option>
+            <option value="CSS">CSS</option>
+            <option value="JavaScript">JavaScript</option>
+            <option value="React">React.js</option>
+            <option value="Node.js">Node.js</option>
+            <option value="MongoDB">MongoDB</option>
+            <option value="MERN/MEAN Developer">MERN/MEAN Developer</option>
+            <option value="Python">Python</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+        <div className="form-group">
+          <label className="form-label">Experience:</label>
+          <select
+            value={experience}
+            onChange={(e) => setExperience(e.target.value)}
+            required
+            className="form-select"
+          >
+            <option value="" disabled>
+              Select Experience
+            </option>
+            <option value="Fresher">Fresher</option>
+            <option value="Experienced">Experienced</option>
+          </select>
+        </div>
+        <button type="submit" className="btn btn-primary">
+          Add User
+        </button>
       </form>
-      <div className="user-list">
-        {users.map((user) => (
-          <div key={user.id} className="user-item">
-            <h3>{user.name}</h3>
-            <p>Email: {user.email}</p>
-            <p>Role: {user.role}</p>
-          </div>
-        ))}
+      {error && <p className="error-message">{error}</p>}
+      {success && <p className="success-message">{success}</p>}
+      <h3 className="mt-4">Existing Users</h3>
+      <div className="table-responsive mt-3">
+        <table className="table table-striped">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Role</th>
+              <th>Experience</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {users.map((user) => (
+              <tr key={user.id}>
+                <td>{user.name}</td>
+                <td>{user.email}</td>
+                <td>{user.role}</td>
+                <td>{user.experience}</td>
+                <td>{user.status}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     </div>
   );
-};
-
-export default HRDashboard;
+}

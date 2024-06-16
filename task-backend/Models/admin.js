@@ -15,6 +15,10 @@ const adminSchema = new mongoose.Schema({
     enum: ["Pending", "Approved", "Rejected"],
     default: "Pending",
   },
+  role: {
+    type: String,
+    required: true,
+  },
 });
 
 module.exports = mongoose.model("Admin", adminSchema);
