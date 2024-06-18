@@ -15,7 +15,7 @@ export default function AdminDashboard() {
       console.log(token);
 
       try {
-        const response = await fetch("http://localhost:8000/pendingusers", {
+        const response = await fetch("https://hr-admin-backend-gi2w.onrender.com/pendingusers", {
           headers: {
             Authorization: `${token}`,
           },
@@ -42,7 +42,7 @@ export default function AdminDashboard() {
       const token = localStorage.getItem("authToken");
 
       try {
-        const response = await fetch("http://localhost:8000/approveusers", {
+        const response = await fetch("https://hr-admin-backend-gi2w.onrender.com/approveusers", {
           headers: {
             Authorization: `${token}`,
           },
@@ -67,7 +67,7 @@ export default function AdminDashboard() {
   const handleApproveUser = async (userId) => {
     const token = localStorage.getItem("authToken");
     try {
-      await fetch(`http://localhost:8000/approve/${userId}`, {
+      await fetch(`https://hr-admin-backend-gi2w.onrender.com/approve/${userId}`, {
         method: "PUT",
         headers: {
           Authorization: `${token}`,
@@ -85,7 +85,7 @@ export default function AdminDashboard() {
     const token = localStorage.getItem("authToken");
 
     try {
-      await fetch(`http://localhost:8000/reject/${userId}`, {
+      await fetch(`https://hr-admin-backend-gi2w.onrender.com/reject/${userId}`, {
         method: "PUT",
         headers: {
           Authorization: `${token}`,
