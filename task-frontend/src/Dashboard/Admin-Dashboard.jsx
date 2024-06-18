@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import "./Admin-Dashboard.css";
 
@@ -12,16 +11,22 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     const fetchUsers = async () => {
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem("authToken");
+      console.log(token);
 
       try {
-        const response = await axios.get("http://localhost:8000/pendingusers", {
+        const response = await fetch("http://localhost:8000/pendingusers", {
           headers: {
             Authorization: `${token}`,
           },
         });
-        console.log("Pending users response data:", response.data);
-        setUsers(response.data);
+        const data = await response.json();
+        console.log("Pending users response data:", data);
+        if (Array.isArray(data)) {
+          setUsers(data);
+        } else {
+          setUsers([]);
+        }
         setError(null);
       } catch (error) {
         console.error("Error fetching users:", error);
@@ -34,17 +39,21 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     const fetchApproveUsers = async () => {
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem("authToken");
 
       try {
-        const response = await axios.get("http://localhost:8000/approveusers", {
+        const response = await fetch("http://localhost:8000/approveusers", {
           headers: {
             Authorization: `${token}`,
           },
         });
-
-        console.log("Approved users response data:", response.data);
-        setApproveUsers(response.data);
+        const data = await response.json();
+        console.log("Approved users response data:", data);
+        if (Array.isArray(data)) {
+          setApproveUsers(data);
+        } else {
+          setApproveUsers([]);
+        }
         setError(null);
       } catch (error) {
         console.error("Error fetching approved users:", error);
@@ -56,18 +65,15 @@ export default function AdminDashboard() {
   }, []);
 
   const handleApproveUser = async (userId) => {
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem("authToken");
     try {
-      await axios.put(
-        `http://localhost:8000/approve/${userId}`,
-        {},
-        {
-          headers: {
-            Authorization: `${token}`,
-          },
-        }
-      );
-
+      await fetch(`http://localhost:8000/approve/${userId}`, {
+        method: "PUT",
+        headers: {
+          Authorization: `${token}`,
+        },
+      });
+      alert("Are You Sure ?");
       setUsers(users.filter((user) => user._id !== userId));
     } catch (error) {
       console.error("Error approving user:", error);
@@ -76,19 +82,16 @@ export default function AdminDashboard() {
   };
 
   const handleRejectUser = async (userId) => {
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem("authToken");
 
     try {
-      await axios.put(
-        `http://localhost:8000/reject/${userId}`,
-        {},
-        {
-          headers: {
-            Authorization: `${token}`,
-          },
-        }
-      );
-
+      await fetch(`http://localhost:8000/reject/${userId}`, {
+        method: "PUT",
+        headers: {
+          Authorization: `${token}`,
+        },
+      });
+      alert("Are You Sure ?");
       setUsers(users.filter((user) => user._id !== userId));
     } catch (error) {
       console.error("Error rejecting user:", error);
@@ -104,7 +107,7 @@ export default function AdminDashboard() {
   return (
     <div className="admin-dashboard">
       <header className="dashboard-header">
-        <h2>Admin Dashboard</h2>
+        <h2>Admin- Dashboard</h2>
         <button className="logout-button" onClick={handleLogout}>
           Logout
         </button>
@@ -148,23 +151,6 @@ export default function AdminDashboard() {
           ))}
         </tbody>
       </table>
-
-      <h3>Approved Users</h3>
-      <ul className="approved-users-list">
-        {approveUsers && approveUsers.length > 0 ? (
-          approveUsers.map((user) => (
-            <li key={user._id}>
-              <p>Name: {user.name}</p>
-              <p>Email: {user.email}</p>
-              <p>Role: {user.role}</p>
-              <p>Experience: {user.experience}</p>
-              <p>Status: {user.status}</p>
-            </li>
-          ))
-        ) : (
-          <p>No approved users found.</p>
-        )}
-      </ul>
     </div>
   );
 }

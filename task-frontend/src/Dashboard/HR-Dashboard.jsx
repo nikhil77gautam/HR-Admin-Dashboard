@@ -25,9 +25,12 @@ export default function HRDashboard() {
         throw new Error("No authentication token found. Please log in.");
       }
 
-      const response = await axios.get("http://localhost:8000/pending", {
-        headers: { Authorization: `${token}` },
-      });
+      const response = await axios.get(
+        "https://hr-admin-backend-gi2w.onrender.com/pending",
+        {
+          headers: { Authorization: `${token}` },
+        }
+      );
 
       setUsers(response.data);
     } catch (error) {
@@ -52,7 +55,7 @@ export default function HRDashboard() {
       }
 
       const response = await axios.post(
-        "http://localhost:8000/adduser",
+        "https://hr-admin-backend-gi2w.onrender.com/adduser",
         { name, email, role, experience },
         { headers: { Authorization: `${token}` } }
       );

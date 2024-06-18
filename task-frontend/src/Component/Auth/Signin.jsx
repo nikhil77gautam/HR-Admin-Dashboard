@@ -13,7 +13,7 @@ export default function Signin() {
     const formData = { email, password };
     try {
       const response = await axios.post(
-        "http://localhost:8000/auth/signin",
+        "https://hr-admin-backend-gi2w.onrender.com/auth/signin",
         formData,
         {
           headers: {
@@ -79,7 +79,7 @@ export default function Signin() {
         <br />
         <div>
           <Link to="/signup">
-            <b style={{ fontFamily: "Serif", color: "blue", }}>
+            <b style={{ fontFamily: "Serif", color: "blue" }}>
               Don't have an account? Signup
             </b>
           </Link>

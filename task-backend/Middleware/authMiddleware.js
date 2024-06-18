@@ -19,7 +19,7 @@ const verifyToken = (req, res, next) => {
   }
 };
 
-module.exports = verifyToken;
+
 
 const rolemiddleware = (roles) => {
   return (req, res, next) => {

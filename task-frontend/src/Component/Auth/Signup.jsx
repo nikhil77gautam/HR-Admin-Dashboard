@@ -16,7 +16,7 @@ export default function Signup() {
     const formData = { name, email, password, role };
     try {
       const response = await axios.post(
-        "http://localhost:8000/auth/signup",
+        "https://hr-admin-backend-gi2w.onrender.com/auth/signup",
         formData,
         {
           headers: {
